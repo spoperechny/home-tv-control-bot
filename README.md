@@ -1,1 +1,1 @@
-# home-tv-contol-bot
+# HomeTV Control Bot
