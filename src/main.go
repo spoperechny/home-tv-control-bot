@@ -9,11 +9,12 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		panic(errors.New("Bot token string must be provided as first argument."))
+	botToken, err := getBotToken()
+	if err != nil {
+		panic(err.Error())
 	}
 
-	bot, err := newBot(os.Args[1], BotUpdateTimeout)
+	bot, err := newBot(botToken, BotUpdateTimeout)
 	browser, err := newBrowser()
 	if err != nil {
 		panic(err.Error())
@@ -22,6 +23,11 @@ func main() {
 	updates, err := bot.GetUpdates()
 	for update := range updates {
 		if update.Message == nil {
+			continue
+		}
+
+		if !isUserAccessAllowed(update.Message.From.UserName) {
+			bot.ReplyToMessage(*update.Message, fmt.Sprintf("Access denied for @%s.", update.Message.From.UserName))
 			continue
 		}
 
@@ -51,4 +57,25 @@ func main() {
 			bot.ReplyToMessage(*update.Message, fmt.Sprintf("%s opened on TV!", url))
 		}
 	}
+}
+
+func getBotToken() (string, error) {
+	if len(os.Args) >= 2 {
+		return os.Args[1], nil
+	}
+
+	return "", errors.New("Bot token string must be provided as first argument.")
+}
+
+func isUserAccessAllowed(username string) bool {
+	if len(os.Args) <= 2 {
+		return true
+	}
+
+	for _, whitelistedUsername := range os.Args[2:] {
+		if username == whitelistedUsername {
+			return true
+		}
+	}
+	return false
 }
