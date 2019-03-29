@@ -15,6 +15,10 @@ func main() {
 	}
 
 	bot, err := newBot(botToken, BotUpdateTimeout)
+	if err != nil {
+		panic(err.Error())
+	}
+
 	browser, err := newBrowser()
 	if err != nil {
 		panic(err.Error())
