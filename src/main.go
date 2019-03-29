@@ -27,7 +27,12 @@ func main() {
 		}
 
 		if !isUserAccessAllowed(update.Message.From.UserName) {
-			bot.ReplyToMessage(*update.Message, fmt.Sprintf("Access denied for @%s.", update.Message.From.UserName))
+			userAppeal := "you"
+			if update.Message.From.UserName != "" {
+				userAppeal = fmt.Sprintf("@%s.", update.Message.From.UserName)
+			}
+
+			bot.ReplyToMessage(*update.Message, fmt.Sprintf("Access denied for %s.", userAppeal))
 			continue
 		}
 
